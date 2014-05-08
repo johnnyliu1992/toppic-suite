@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<prsm_list>
+<prsm>
+  <prsm_id>-1</prsm_id>
+  <spectrum_id>374</spectrum_id>
+  <spectrum_scan>504</spectrum_scan>
+  <precursor_id>0</precursor_id>
+  <ori_prec_mass>5377.0931882813</ori_prec_mass>
+  <adjusted_prec_mass>5377.0640650000</adjusted_prec_mass>
+  <calibration>0.0000000000</calibration>
+  <fdr>-1.0000000000</fdr>
+  <match_peak_num>5.0000000000</match_peak_num>
+  <match_fragment_num>5.0000000000</match_fragment_num>
+  <proteoform>
+    <start_pos>8</start_pos>
+    <end_pos>54</end_pos>
+    <db_residue_seq>
+      <id>2903</id>
+      <name>gi|16766312|ref|NP_461927.1| 2-acylglycerophospho-ethanolamine acyl transferase/acyl-acyl carrier protein synthetase [Salmonella typhimurium LT2]</name>
+    </db_residue_seq>
+    <prot_mod>
+      <name>NONE</name>
+    </prot_mod>
+    <change_list/>
+  </proteoform>
+  <ms>
+    <ms_header>
+      <file_name>in/spectra.msalign</file_name>
+      <id>374</id>
+      <prec_id>0</prec_id>
+      <title></title>
+      <level>2</level>
+      <scans>504</scans>
+      <scan_list>
+        <scan>504</scan>
+      </scan_list>
+      <retention_time>0.0000000000</retention_time>
+      <prec_sp_mz>-1.0000000000</prec_sp_mz>
+      <prec_mono_mz>449.0983750234</prec_mono_mz>
+      <precursor_charge>12</precursor_charge>
+      <prec_charge>12</prec_charge>
+      <error_tolerance>0.0000000000</error_tolerance>
+      <activation>
+        <name>CID</name>
+      </activation>
+      <precursor_mz>449.0984</precursor_mz>
+      <precursor_mass>5377.0932</precursor_mass>
+    </ms_header>
+  </ms>
+</prsm>
+</prsm_list>
