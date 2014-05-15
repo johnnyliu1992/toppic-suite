@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>msalign+</title>
+    <title>TopID</title>
     <link rel="stylesheet" href="http://cdn.bootcss.com/twitter-bootstrap/3.0.3/css/bootstrap.min.css">
     
   </head>
@@ -28,22 +28,26 @@
 			return;
 		}
 		
-		var arr = document.getElementById('specPath').value.split('.');
-		if(arr.length<=1 || arr[length-1]!="msalign"){
+		var arr = document.getElementById('specPath').value;
+		if(arr.length<=8 || arr.substr(arr.length-8,8)!=".msalign"){
 			alert("Spectra file must be msalign file!");
 			return;
 		}
-		
-		arr = document.getElementById('dataPath').value.split('.');
-		if(arr.length<=1 || arr[length-1]!="fasta"){
+
+		arr = document.getElementById('dataPath').value;
+		if(arr.length<=6 || arr.substr(arr.length-6,6)!=".fasta"){
 			alert("Database file must be fasta file!");
 			return;
 		}
-		
  		var formobject = document.getElementById("arguments");
  		formobject.submit();
  		$("#myModal").modal({show:true});
 		
+	}
+	
+	function showDownload(ids){
+		document.getElementById("downloadFrm").src="checkZip.do?path="+ids;
+		$("#downloadModal").modal({show:true});
 	}
 	
 	function refreshProcessingBar(){
@@ -68,7 +72,7 @@
 		msalign_check_id = window.setInterval(refreshProcessingBar, 3000);
 	}
 	
-	function checkInt(d){
+	function checkInt(d,v){
 		var t = d.value;
 		if(t.length<=0)
 		{
@@ -80,7 +84,7 @@
 		    { 
 		    }else{ 
 		    	alert("must be positive");
-		      d.value="15";
+		      d.value=v;
 		      d.focus();
 		      break;
 		    }
@@ -102,6 +106,8 @@
 		$('#myModal').modal("hide");
 		document.getElementById("resultTab").click();
 		document.getElementById('resultFrame').src="./taskList.do";
+		document.getElementById('taskTitle').value='';
+		document.getElementById('specPath').value=''
 	}
 	
 
@@ -110,7 +116,7 @@
 	<!-- header -->
 	<div class="bs-header" id="content">
 		<div class="container">
-			<h1 style="color:#0099DD;">TopPC</h1>
+			<h1 style="color:#0099DD;">TopID</h1>
 		</div>
 	</div>
 
@@ -118,9 +124,9 @@
 
 		<!-- Nav tabs -->
 		<ul class="nav nav-tabs">
-			<li><a href="#msalignplus" data-toggle="tab">MsAlign+</a></li>
+			<li><a href="#msalignplus" data-toggle="tab">TopID</a></li>
 <!-- 			<li><a href="#profile" data-toggle="tab" id="runtab">Running</a></li> -->
-			<li><a href="#result" data-toggle="tab" id="resultTab">Result</a></li>
+			<li><a href="#result" data-toggle="tab" id="resultTab" onclick="document.getElementById('resultFrame').src='./taskList.do';">Results</a></li>
 		</ul>
 
 		<!-- Tab panes -->
@@ -170,14 +176,14 @@
 							<label class="col-sm-2 control-label" style="width:250px">Protein N-Terminal Variable PTM:</label>
 							<div class="input-group input-group">
 							<input type="hidden" name="nptm1" value="NONE">
-							&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" name= "nptm2" value ="NME"> NME
-							&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" name= "nptm3" value = "NME_ACETYLATION"> NME and N-Terminal Acetylation
+							&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" name= "nptm2" value ="NME" checked="true"> NME
+							&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" name= "nptm3" value = "NME_ACETYLATION" checked="true"> NME and N-Terminal Acetylation
 							</div>
 						</div>
 						<br />
 						<div class="input-group input-group">
 							<label class="col-sm-2 control-label" style="width:330px">Parent and Fragment Mass Error Tolerance:</label>
-							<input type="text" class="form-control" name="error" style="width:250px" value="15"  check-type="required" onblur="checkInt(this)">PPM
+							<input type="text" class="form-control" name="error" style="width:250px" value="15"  check-type="required" onblur="checkInt(this,15)">PPM
 <!-- 							<span class="input-group-addon">PPM</span>  -->
 						</div>
 						<br />
@@ -185,8 +191,8 @@
 							<label class="col-sm-2 control-label" style="width:250px">Cysteine Protecting Group:</label>
 							<select	class="form-control" name="cpg" style="width:250px" >
 								<option value="C0">NONE</option>
-								<option value="C57">Carbamidomethylation(+57)</option>
-								<option value="C58">Carbamidomethylation(+58)</option>
+								<option value="C57">Carbamidomethylation (C57)</option>
+								<option value="C58">Carboxymethylation (C58)</option>
 							</select>
 						</div>
 						<br />
@@ -217,6 +223,11 @@
 							</select>
 						</div>
 						<br />
+						<div class="input-group input-group">
+							<label class="col-sm-2 control-label" style="width:250px">Max PTM Mass:</label>
+							<input type="text" class="form-control" name="maxptmmass" style="width:250px" value="1000000" onblur="checkInt(this,1000000)">
+						</div>
+						<br />
 <!-- 						<input type="submit" class="btn btn-primary" value="Submit" /> -->
 						<button type="button" id="submitBtn" data-loading-text="Submit..." class="btn btn-primary" onclick="submitArgument()">Submit</button>
 											
@@ -245,7 +256,7 @@
 			</div>-->
 			<div class="tab-pane" id="result" style="width:900px">
 				<div class="panel panel-default" style='padding: 20px 20px 20px 20px;width:860px'>
-				<iframe id="resultFrame" name="file" src="./taskList.do" width="800px" height="400px"></iframe>
+				<iframe id="resultFrame" name="file" src="./taskList.do" width="820px" height="400px"></iframe>
 			    </div>
 			</div>
 		</div>
@@ -257,21 +268,41 @@
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h4 class="modal-title">Uploading</h4>
+        <h4 class="modal-title">Processing</h4>
       </div>
       <div class="modal-body">
         <p>Info</p>
         <div>
-        <iframe id="subFrame" name="addTask" src="" width="550px" height="150px"></iframe>
+        <iframe id="subFrame" name="addTask" src="page/uploading.jsp" width="550px" height="150px"></iframe>
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Submit Another Task</button>
-        <button type="button" class="btn btn-primary" onclick="showTask()">See Result</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal" onclick="document.getElementById('taskTitle').value='';document.getElementById('specPath').value=''">Submit Another Task</button>
+        <button type="button" class="btn btn-primary" onclick="showTask()">See Results</button>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 	
+<div class="modal fade" id="downloadModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">Processing</h4>
+      </div>
+      <div class="modal-body">
+        <p>Info</p>
+        <div>
+        <iframe id="downloadFrm" name="downloadTask" src="" width="550px" height="150px"></iframe>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
 </body>
 </html>

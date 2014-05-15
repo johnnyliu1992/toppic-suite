@@ -4,4 +4,6 @@ public class RunningInfo {
 
 	public static String taskName="";
 	
+	public static String PROCESS_ID="";
+	
 }

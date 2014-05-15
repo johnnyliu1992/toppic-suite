@@ -19,6 +19,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
@@ -27,6 +28,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.ModelAndView;
 import org.w3c.dom.Document;
 
 import edu.iupui.iac.msalignplus.action.Commands;
@@ -42,7 +44,7 @@ public class RunApplicationMsAlignPlus {
 	@RequestMapping("process")
 	public String Porcess(String title, String fragMeth, int error, String cpg,
 			String cType, double cutValue, int nuPTM, String sType,
-			String nptm1,String nptm2, String nptm3,
+			String nptm1,String nptm2, String nptm3,int maxptmmass,
 			@RequestParam("specFile") MultipartFile specFile,
 			@RequestParam("dataFile") MultipartFile dataFile) {
 		
@@ -86,42 +88,9 @@ public class RunApplicationMsAlignPlus {
 		}
 		Argument arguments = new Argument(title, fragMeth,
 				specFile.getOriginalFilename(), dataFile.getOriginalFilename(),
-				nptms, error, cpg, sType, cType, cutValue, nuPTM);
+				nptms, error, cpg, sType, cType, cutValue, nuPTM,maxptmmass);
 		
-		FileOutputStream out = null;
-		try {
-			DocumentBuilderFactory factory = DocumentBuilderFactory
-					.newInstance();
-			DocumentBuilder builder;
-			
-			builder = factory.newDocumentBuilder();
-
-			Document document = builder.newDocument();
-			document.appendChild(arguments.toElement(document));
-			TransformerFactory transFactory = TransformerFactory.newInstance();
-			Transformer transFormer = transFactory.newTransformer();
-			DOMSource domSource = new DOMSource(document);
-			File file = new File(rootPath+processingPath+"arguments.xml");
-			if (!file.exists()) {
-				file.createNewFile();
-			}
-			out = new FileOutputStream(file);
-			StreamResult xmlResult = new StreamResult(out);
-			transFormer.transform(domSource, xmlResult);
-//			System.out.println(file.getAbsolutePath());
-		} catch (ParserConfigurationException | IOException
-				| TransformerException e) {
-			e.printStackTrace();
-		}
-		finally{
-			if(out!=null){
-				try {
-					out.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
+		Argument.saveArgument(rootPath+processingPath, arguments);
 		
 		FileUtils.addTaskList(id+"",rootPath+processingPath,rootPath+"tool/tasklist.xml");
 		
@@ -152,12 +121,22 @@ public class RunApplicationMsAlignPlus {
 	}
 
 	@RequestMapping("deleteTask")
-	public String deleteTask(String delName){
+	public String deleteTask(String delName,String isRunning){
 		String rootPath = request.getSession().getServletContext().getRealPath("/")+"result/";
 		String os = System.getProperties().get("os.name").toString();
 		if (os.startsWith("Win")) {
 			try {
-				Commands.RunCommand("cmd /c cd " + rootPath + " && rd /s /q "+delName);
+				if(isRunning.equalsIgnoreCase("1")){
+					Commands.RunCommand("cmd /c taskkill /f /im topid.exe ");
+					FileUtils.appendFile(rootPath+delName+"/log.txt", "[Force stopp]");
+					Argument arg = Argument.getArgument(rootPath+delName, "arguments.xml");
+					arg.setEnd(System.currentTimeMillis());
+					Argument.saveArgument(rootPath+delName, arg);
+				}
+				else{
+					FileUtils.delTaskInfo(delName.replace("TASK", ""), request.getSession().getServletContext().getRealPath("/")+"tool/tasklist.xml");
+					Commands.RunCommand("cmd /c cd " + rootPath + " && rd /s /q "+delName);
+				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -167,11 +146,15 @@ public class RunApplicationMsAlignPlus {
 	
 	@RequestMapping("runningPercent")
 	public void processInfoRow(String name, HttpServletResponse response){
+		
 		String rootPath = request.getSession().getServletContext().getRealPath("/");
+		
+		Argument arg = Argument.getArgument(rootPath+"result/"+name+"/", "arguments.xml");
 		
 		File taskEndFile = new File(rootPath+"result/"+name+"/log.txt");
 		double per=0.00;
 		String status="Waiting";
+		int change = 1;
 		if(taskEndFile.exists()){
 			per=0.01;
 			FileReader reader = null;
@@ -181,44 +164,45 @@ public class RunApplicationMsAlignPlus {
 				reader = new FileReader(rootPath + "result/" + name + "/log.txt");
 				br = new BufferedReader(reader);
 				String str = null;
-				String line1 = "";
-				String line2 = "";
-				String line3 = "";
 				while ((str = br.readLine()) != null) {
-					line3 = line2;
-					line2 = line1;
-					line1 = str;
 					if(str.contains("Exectutive directory is")){
-						per=1.0;
+						per=0.01;
 					}
 					
-					if(str.contains("Zero ptm search complete")){
-						int a=Integer.parseInt(str.substring(str.length()-6, str.length()-5));
-						int b=Integer.parseInt(str.substring(str.length()-1, str.length()));
-						per=a*15/b;
+					if(str.contains("Zero ptm searching is processing")){
+						String temp = str.replace("Zero ptm searching is processing ", "");
+						temp = temp.replace(" spectra.", "");
+						String[] array = temp.split("of");
+						int a=Integer.parseInt(array[0].replace(" ", ""));
+						int b=Integer.parseInt(array[1].replace(" ", ""));
+						per=0.01+a*1500/b/100.0;
 					}
-					if(str.contains("Fast filter")){
-						per=15;
+					if(str.contains("Fast filtering block") && str.contains("is processing")){
+						//Fast filtering block 1 is processing 2987 of 3474 spectra.
+						String temp = str.replace("Fast filtering block", "");
+						temp=temp.substring(temp.indexOf("is processing "),temp.length());
+						temp = temp.replace("is processing ", "");
+						temp = temp.replace(" spectra.", "");
+						String[] array = temp.split("of");
+						int a=Integer.parseInt(array[0].replace(" ", ""));
+						int b=Integer.parseInt(array[1].replace(" ", ""));
+						per=15+a*3000/b/100.0;
 					}
-					
-					if(str.contains("Ptm alignment")){
-						per=45;
+					if(str.contains("Ptm searching is processing")){
+						String temp = str.replace("Ptm searching is processing ", "");
+						temp = temp.replace(" spectra.", "");
+						String[] array = temp.split("of");
+						int a=Integer.parseInt(array[0].replace(" ", ""));
+						int b=Integer.parseInt(array[1].replace(" ", ""));
+						per=45+a*3000/b/100.0;
 					}
-					if(str.contains("Ptm search complete")){
-						int a=Integer.parseInt(str.substring(str.length()-6, str.length()-5));
-						int b=Integer.parseInt(str.substring(str.length()-1, str.length()));
-						per=45+a*35/b;
-					}
-					if(str.contains("Combine prsms")){
-						per=80;
-					}
-					if(str.contains("Evalue computation complete")){
-						String temp = str.replace("Evalue computation complete ", "");
-						//System.out.println(temp.substring(0, 1));
-						//System.out.println(temp.substring(5, 6));
-						int a=Integer.parseInt(temp.substring(0, 1));
-						int b=Integer.parseInt(temp.substring(5, 6));
-						per=80+a*17/b;
+					if(str.contains("E-value computation is processing")){
+						String temp = str.replace("E-value computation is processing ", "");
+						temp = temp.replace(" spectra.", "");
+						String[] array = temp.split("of");
+						int a=Integer.parseInt(array[0].replace(" ", ""));
+						int b=Integer.parseInt(array[1].split("scan number")[0].replace(" ", ""));
+						per=75+a*2200/b/100.0;
 					}
 					if(str.contains("Top selector")){
 						per=97;
@@ -229,20 +213,42 @@ public class RunApplicationMsAlignPlus {
 					if(str.contains("XalanTransformer")){
 						per=99;
 					}
-					if(str.contains("proteins.xml")){
+					if(str.contains("proteins.xml")||str.contains("Identification End!")){
 						per=100;
+					}
+					if(str.contains("[Force stopp]")){
+						status="force stop";
+					}
+					if(str.contains("[Exception]")){
+						status="error";
 					}
 				}
 				if(per==100){
 					status="finished";
+//					File file = new File(rootPath+"result/"+name+"/"+name+".zip");
+//					if(file.exists()){
+//						change=1;
+//					}
 				}
 				else if(RunningInfo.taskName.contains(name)){
 					status="running";
 				}
 				else {
-					status="error";
+					if(!status.equalsIgnoreCase("force stop")){
+						status="error";
+					}
 				}
-				response.getWriter().write(per+"%,"+status);
+				if(status.equalsIgnoreCase("error") && arg.getEnd()==0){
+					status="unexpected stop";
+					arg.setEnd(arg.getStart());
+				}
+				
+				String per_str=per+"";
+				if(per_str.endsWith(".0")){
+					per_str+="0";
+				}
+				
+				response.getWriter().write(per_str+" %,"+status+","+change+","+arg.getCostString());
 			} catch (IOException e) {
 				e.printStackTrace();
 			} finally {
@@ -262,7 +268,7 @@ public class RunApplicationMsAlignPlus {
 		}
 		else{
 			try {
-				response.getWriter().write("0.0%,waiting");
+				response.getWriter().write("0.00 %,waiting,0,0:00:00");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -272,8 +278,41 @@ public class RunApplicationMsAlignPlus {
 	
 	@RequestMapping("zipdown")
 	public void zipAndDownload(String path,HttpServletResponse response) throws Exception{
+//        String rootPath = request.getSession().getServletContext().getRealPath("/")+"result/"+path+"/";
+//        
+//        File file = new File(rootPath+path+".zip");
+//		if (!file.exists()) {
+//			FileUtils.zip(
+//					request.getSession().getServletContext().getRealPath("/")
+//							+ "temp/" + path + ".zip", rootPath);
+//			Commands.RunCommand("cmd /c move "
+//					+ request.getSession().getServletContext().getRealPath("/")
+//					+ "temp\\" + path + ".zip " + rootPath);
+//		}
+//        response.setHeader("Content-disposition","attachment; filename="+path+".zip");
+//        BufferedInputStream buffInput=new BufferedInputStream(new FileInputStream(rootPath+path+".zip"));
+//        BufferedOutputStream buffout=new BufferedOutputStream(response.getOutputStream());
+//        int length=-1;
+//        byte[] buff=new byte[1024];
+//		while ((length = buffInput.read(buff)) != -1) {
+//			buffout.write(buff, 0, length);
+//		}
+//		buffout.flush();
+//		buffInput.close();
+//		buffout.close();
+
+	}
+	
+	@RequestMapping("checkZip")
+	public ModelAndView checkZip(String path){
+		ModelAndView ma = new ModelAndView("zipping");
+		ma.addObject("path", path);
+		return ma;
+	}
+	
+	@RequestMapping("zipping")
+	public void zipping(String path) throws Exception{
         String rootPath = request.getSession().getServletContext().getRealPath("/")+"result/"+path+"/";
-        
         File file = new File(rootPath+path+".zip");
 		if (!file.exists()) {
 			FileUtils.zip(
@@ -283,19 +322,21 @@ public class RunApplicationMsAlignPlus {
 					+ request.getSession().getServletContext().getRealPath("/")
 					+ "temp\\" + path + ".zip " + rootPath);
 		}
-        response.setHeader("Content-disposition","attachment; filename="+path+".zip");
-        BufferedInputStream buffInput=new BufferedInputStream(new FileInputStream(rootPath+path+".zip"));
-        BufferedOutputStream buffout=new BufferedOutputStream(response.getOutputStream());
-        int length=-1;
-        byte[] buff=new byte[1024];
-		while ((length = buffInput.read(buff)) != -1) {
-			buffout.write(buff, 0, length);
-		}
-		buffout.flush();
-		buffInput.close();
-		buffout.close();
-
 	}
+	
+	@RequestMapping("zipover")
+	public void zipover(String path,HttpServletResponse response) throws Exception{
+		String rootPath = request.getSession().getServletContext().getRealPath("/")+"result/"+path+"/";
+		File file = new File(rootPath+path+".zip");
+		if(file.exists()){
+			response.getWriter().write("1");
+		}
+		else{
+			response.getWriter().write("0");
+		}
+	}
+	
+
 	
 //	@RequestMapping("runninginfo")
 //	public void processInfo(HttpServletResponse response){

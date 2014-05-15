@@ -15,7 +15,8 @@ function finished(){
 </head>
 <body onload="finished()">
 <div class="container">
-<p>Submit Success</p>
+<p>Uploading files!</p>
+<p>Submission is complete!</p>
 </div>
 </body>
 </html>

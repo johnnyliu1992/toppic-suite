@@ -1,8 +1,14 @@
 package edu.iupui.iac.msalignplus.action;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -20,6 +26,45 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 public class FileUtils {
+	
+	public static void appendFile(String filename,String content){
+		File file = new File(filename);
+		FileWriter writer;
+		try {
+			if(!file.exists()){
+				file.createNewFile();
+			}
+			Thread.sleep(3000l);
+			writer = new FileWriter(filename, true);
+	        writer.write(content);
+	        writer.close();
+		} catch (IOException | InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static List<String[]> getProcessInfo(String filename){
+		List<String[]> list = new ArrayList<String[]>();
+		FileReader reader;
+		try {
+			reader = new FileReader(filename);
+			BufferedReader br = new BufferedReader(reader);
+			String str = null;
+			while ((str = br.readLine()) != null) {
+				str = str.replace("                     ", ",");
+				str = str.replace(" ", ",");
+				str = str.replace("                    ", ",");
+				str = str.replace("  ", ",");
+				String[] temp = str.split(",");
+				list.add(temp);
+			}
+			br.close();
+			reader.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return list;
+	}
 
 	public static int getTaskId(String filename){
 		Document data = load(filename);
@@ -64,7 +109,39 @@ public class FileUtils {
 			return a;
 		}
 		return null;
-		
+	}
+	
+	public static String[] delTaskInfo(String id,String file){
+		Document data = load(file);
+		int number = data.getElementsByTagName("task").getLength();
+		boolean isExist=false;
+		if(number>0){
+			String[] a=new String[]{"",""};
+			Node task = null;
+			for(int i=0;i<number;i++){
+				task = data.getElementsByTagName("task").item(i);
+				NodeList taskinfo = task.getChildNodes();
+				for(int j=0;j<taskinfo.getLength();j++){
+					System.out.println(taskinfo.item(j).getTextContent());
+					if(taskinfo.item(j).getNodeName().equals("path")){
+						a[1]=taskinfo.item(j).getTextContent();
+					}
+					if(taskinfo.item(j).getNodeName().equals("id")){
+						a[0]=taskinfo.item(j).getTextContent();
+					}
+				}
+				if(a[0].equalsIgnoreCase(id)){
+					isExist = true;
+					break;
+				}
+			}
+			if(isExist){
+				data.getDocumentElement().removeChild(task);
+			}
+			doc2XmlFile(data,file);
+			return a;
+		}
+		return null;
 	}
 	
 	public static String[] getInputFile(String file){

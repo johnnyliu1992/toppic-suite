@@ -140,7 +140,7 @@ public class FileUploadController {
 		ModelAndView mav = new ModelAndView("fileList");
 		File uploadDest = new File(filePath);
 		String[] fileNames = uploadDest.list();
-		List<String> file_level_2 = new ArrayList();
+		List<String> file_level_2 = new ArrayList<String>();
 		for(int i=0;i<fileNames.length;i++){
 			File temp = new File(filePath+"/"+fileNames[i]);
 			if(temp.isDirectory()){
