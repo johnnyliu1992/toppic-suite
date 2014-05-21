@@ -1,4 +1,8 @@
 <!DOCTYPE html>
+<%
+String path = request.getContextPath();
+String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
+%>
 <html>
   <head>
     <title>TopID</title>
@@ -20,17 +24,17 @@
 			return;
 		}
 		if(document.getElementById('specPath').value==""){
-			alert("Spectra file can not be empty!");
+			alert("Spectrum File can not be empty!");
 			return;
 		}
 		if(document.getElementById('dataPath').value==""){
-			alert("Database file can not be empty!");
+			alert("Database File can not be empty!");
 			return;
 		}
 		
 		var arr = document.getElementById('specPath').value;
 		if(arr.length<=8 || arr.substr(arr.length-8,8)!=".msalign"){
-			alert("Spectra file must be msalign file!");
+			alert("Database File must be msalign file!");
 			return;
 		}
 
@@ -114,8 +118,11 @@
 	</script>
 
 	<!-- header -->
-	<div class="bs-header" id="content">
-		<div class="container">
+	<div class="container" id="content">
+		<div class="header">
+			<ul class="nav nav-pills pull-right">
+	          <li class="active"><a href="<%=basePath %>page/helpFile.pdf">Help</a></li>
+	        </ul>
 			<h1 style="color:#0099DD;">TopID</h1>
 		</div>
 	</div>
@@ -215,7 +222,7 @@
 						</div>
 						<br />
 						<div class="input-group input-group">
-							<label class="col-sm-2 control-label" style="width:250px">Number of Unexpected PTM:</label>
+							<label class="col-sm-2 control-label" style="width:250px">Number of Unexpected PTMs:</label>
 							<select	class="form-control" name="nuPTM" style="width:250px" >
 								<option>2</option>
 								<option>1</option>
@@ -256,7 +263,7 @@
 			</div>-->
 			<div class="tab-pane" id="result" style="width:900px">
 				<div class="panel panel-default" style='padding: 20px 20px 20px 20px;width:860px'>
-				<iframe id="resultFrame" name="file" src="./taskList.do" width="820px" height="400px"></iframe>
+				<iframe id="resultFrame" name="file" src="./taskList.do" width="820px" height="897px"></iframe>
 			    </div>
 			</div>
 		</div>

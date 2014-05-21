@@ -34,7 +34,7 @@ public class FileUtils {
 			if(!file.exists()){
 				file.createNewFile();
 			}
-			Thread.sleep(3000l);
+			Thread.sleep(1000l);
 			writer = new FileWriter(filename, true);
 	        writer.write(content);
 	        writer.close();

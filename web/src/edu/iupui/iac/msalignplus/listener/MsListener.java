@@ -16,13 +16,11 @@ public class MsListener implements ServletContextListener {
 	
 	@Override
 	public void contextDestroyed(ServletContextEvent arg0) {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void contextInitialized(ServletContextEvent arg0) {
-		// TODO Auto-generated method stub
 		System.out.println("task init");
 		try {
 			Commands.RunCommand("cmd /c tasklist |findstr /i topid.exe >"+arg0.getServletContext().getRealPath("/")+"temp/cmd.log");

@@ -12,35 +12,6 @@ public class DefaultIndexController {
 		return new ModelAndView("index");
 	}
 	
-//	@RequestMapping("toFileUpload")
-//	public String toFileUpload(){
-//		return "fileUpload";
-//	}
-//	
-//	@RequestMapping("toFilesUpload")
-//	public String toFilesUpload(){
-//		return "filesUpload";
-//	}
-//	
-//	@RequestMapping("toSpectraFile")
-//	public String toSpectraFile(){
-//		return "SpectraFile";
-//	}
-//	
-//	@RequestMapping("toDatabaseFile")
-//	public String toDatabaseFile(){
-//		return "DatabaseFile";
-//	}
-//	
-//	@RequestMapping("toConfig")
-//	public String toConfig(){
-//		return "config";
-//	}
-//	
-//	@RequestMapping("uploadsucc")
-//	public String uploadSucc(){
-//		return "uploadSucc";
-//	}
 }
 
 

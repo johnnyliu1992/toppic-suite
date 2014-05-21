@@ -15,7 +15,6 @@ public class Commands {
 	}
 
 	public static void RunCommand(String commandLine,boolean getresult) throws IOException {
-//		System.out.println(commandLine);
 		Process pro = null;
 		BufferedReader br =null;
 		try {
