@@ -14,7 +14,7 @@ var msalign_check_id = window.setInterval(refreshProcessingBar, 3000);
 function refreshProcessingBar(){
 	htmlobj=$.ajax({url:"zipover.do?path=<%=name %>",async:false});
 	if(htmlobj.responseText=="1"){
-		document.getElementById("info").innerHTML=document.getElementById("info").innerHTML+"<br/>Zipping complete!<br/>Please click the link to download!";
+		document.getElementById("info").innerHTML=document.getElementById("info").innerHTML+"<br/>Zipping is completed!<br/>Please click the following link to download the files!";
 		document.getElementById("links").style.display="";
 		window.clearTimeout(msalign_check_id); 
 	}
@@ -34,7 +34,7 @@ function refreshProcessingBar(){
 </script>
 </head>
 <body onload="refreshProcessingBar()">
-<div id="info">It's zipping the files,please waitting a moment!</div>
+<div id="info">Please wait a moment.<br/>Zipping the files ...</div>
 <div id="links" style="display:none"><a href="result/<%=name%>/<%=name%>.zip"><%=name %>.zip</a></div>
 </body>
 </html>

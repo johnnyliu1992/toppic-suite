@@ -94,29 +94,6 @@ public class RunApplicationMsAlignPlus {
 		
 		FileUtils.addTaskList(id+"",rootPath+processingPath,rootPath+"tool/tasklist.xml");
 		
-//		String os = System.getProperties().get("os.name").toString();
-//		System.out.println(os);
-//		String commandLine="";
-//		if (os.startsWith("Win")) {
-//			try {
-//				commandLine = "cmd /c cd " + rootPath + " && xcopy tool "
-//						+ processingPath.replace("/", "\\") + " /y /e";
-//
-//				Commands.RunCommand(commandLine,true);
-//
-//				commandLine = "cmd /c cd " + rootPath + processingPath + " && proteomics_cpp.exe>log.txt";
-//				Commands.RunCommand(commandLine,true);
-//				
-//				commandLine = "cmd /c cd " + rootPath + processingPath + " && html_tools.jar";
-//				Commands.RunCommand(commandLine,true);
-//				
-//				commandLine = "cmd /c cd " + rootPath + processingPath + " && copy in\\*.msalign && copy in\\*.fasta && copy in\\arguments.xml && copy in\\*.OUTPUT_TABLE  && rd /s /q conf etc xml xsl in && del *.jar *.exe *.dll";
-//				Commands.RunCommand(commandLine,true);
-//				
-//			} catch (IOException e) {
-//				e.printStackTrace();
-//			}
-//		}
 		return "subsucc";
 	}
 
@@ -129,9 +106,9 @@ public class RunApplicationMsAlignPlus {
 				if(isRunning.equalsIgnoreCase("1")){
 					Commands.RunCommand("cmd /c taskkill /f /im topid.exe ");
 					FileUtils.appendFile(rootPath+delName+"/log.txt", "[Force stopp]");
-					Argument arg = Argument.getArgument(rootPath+delName, "arguments.xml");
+					Argument arg = Argument.getArgument(rootPath+delName+"/", "arguments.xml");
 					arg.setEnd(System.currentTimeMillis());
-					Argument.saveArgument(rootPath+delName, arg);
+					Argument.saveArgument(rootPath+delName+"/", arg);
 				}
 				else{
 					FileUtils.delTaskInfo(delName.replace("TASK", ""), request.getSession().getServletContext().getRealPath("/")+"tool/tasklist.xml");
@@ -225,10 +202,6 @@ public class RunApplicationMsAlignPlus {
 				}
 				if(per==100){
 					status="finished";
-//					File file = new File(rootPath+"result/"+name+"/"+name+".zip");
-//					if(file.exists()){
-//						change=1;
-//					}
 				}
 				else if(RunningInfo.taskName.contains(name)){
 					status="running";
@@ -244,8 +217,11 @@ public class RunApplicationMsAlignPlus {
 				}
 				
 				String per_str=per+"";
-				if(per_str.endsWith(".0")){
+				if(per_str.length()==per_str.indexOf(".")+2){
 					per_str+="0";
+				}
+				if(per_str.length()>per_str.indexOf(".")+2){
+					per_str=per_str.substring(0,per_str.indexOf(".")+3);
 				}
 				
 				response.getWriter().write(per_str+" %,"+status+","+change+","+arg.getCostString());
@@ -276,32 +252,7 @@ public class RunApplicationMsAlignPlus {
 		
 	}
 	
-	@RequestMapping("zipdown")
-	public void zipAndDownload(String path,HttpServletResponse response) throws Exception{
-//        String rootPath = request.getSession().getServletContext().getRealPath("/")+"result/"+path+"/";
-//        
-//        File file = new File(rootPath+path+".zip");
-//		if (!file.exists()) {
-//			FileUtils.zip(
-//					request.getSession().getServletContext().getRealPath("/")
-//							+ "temp/" + path + ".zip", rootPath);
-//			Commands.RunCommand("cmd /c move "
-//					+ request.getSession().getServletContext().getRealPath("/")
-//					+ "temp\\" + path + ".zip " + rootPath);
-//		}
-//        response.setHeader("Content-disposition","attachment; filename="+path+".zip");
-//        BufferedInputStream buffInput=new BufferedInputStream(new FileInputStream(rootPath+path+".zip"));
-//        BufferedOutputStream buffout=new BufferedOutputStream(response.getOutputStream());
-//        int length=-1;
-//        byte[] buff=new byte[1024];
-//		while ((length = buffInput.read(buff)) != -1) {
-//			buffout.write(buff, 0, length);
-//		}
-//		buffout.flush();
-//		buffInput.close();
-//		buffout.close();
-
-	}
+	
 	
 	@RequestMapping("checkZip")
 	public ModelAndView checkZip(String path){

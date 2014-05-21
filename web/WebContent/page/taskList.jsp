@@ -13,13 +13,14 @@
 <script src="http://cdn.bootcss.com/twitter-bootstrap/3.0.3/js/bootstrap.min.js"></script>
 <script type="text/javascript">
 function toDeleteResult(name,obj){
-	if(obj.innerHTML=="Stop"){
+	if(obj.innerHTML=="&nbsp;&nbsp;Stop&nbsp;&nbsp;"){
 		if(confirm("Do you want to stop this task?"))
 		{
 			document.getElementById('runningStats').value="1";
 			document.getElementById('delName_id').value=name;
 			document.getElementById('deleteFrm').submit();
 			document.getElementById("BtnR"+ids).style.display="none";
+			document.getElementById("BtnG"+ids).style.display="";
 		}
 	}
 	else if(obj.innerHTML=="Delete"){
@@ -47,7 +48,7 @@ function refreshRow(ids){
 		}
 	}
 	else {
-		document.getElementById("BtnD"+ids).innerHTML="Stop";
+		document.getElementById("BtnD"+ids).innerHTML="&nbsp;&nbsp;Stop&nbsp;&nbsp;";
 	}
 	if(arr[1]=="error"){
 		
@@ -64,7 +65,7 @@ function downloadRow(ids){
 </head>
 <body>
 <table class="table table-bordered"  style="width:800px;">
-<thead><tr><td>Task Info</td><td>Title</td><td>Start Time</td><td title='hours:minutes:seconds'>Time</td><td>Progress</td><td><button type='button' class='btn btn-success btn-xs' onclick="window.location.reload()">Refresh All</button></td></tr></thead>
+<thead><tr><td>Task Info</td><td>Title</td><td>Start Time</td><td  align="right" title='hours:minutes:seconds'>Time</td><td align="right">Progress</td><td><button type='button' class='btn btn-success btn-xs' onclick="window.location.reload()">Refresh All</button></td></tr></thead>
 <tbody>
 <%
 String path = request.getScheme()+"://"+request.getHeader("host")+request.getContextPath();
@@ -192,7 +193,10 @@ if(fileName != null){
 			
 		}
 		if(status.equalsIgnoreCase("finished")){
-			out.println("<a href='"+path+"/result/"+fileName[i]+"/spectra_html/proteins.html' target='_blank'>");
+			if(null!=arg){
+			    String foldername = arg.getSpectrum_File().replace(".msalign", "");
+			    out.println("<a href='"+path+"/result/"+fileName[i]+"/"+(arg==null?"#":foldername)+"_html/proteins.html' target='_blank'>");
+			}
 		}
 		else if(status.equalsIgnoreCase("waiting")){
 			out.println("<a href='"+path+"/fileList.do?path=/"+fileName[i]+"' target='_blank'>");
@@ -219,27 +223,30 @@ if(fileName != null){
 		}
 		out.println("<td id='TD"+fileName[i]+"' width='10%' align='right'>");
 		String per_str=per+"";
-		if(per_str.endsWith(".0")){
+		if(per_str.length()==per_str.indexOf(".")+2){
 			per_str+="0";
+		}
+		if(per_str.length()>per_str.indexOf(".")+2){
+			per_str=per_str.substring(0,per_str.indexOf(".")+3);
 		}
 		out.println(per_str);
 		out.println("%</td><td width='18%' valign='top'>");
 		if(status.equalsIgnoreCase("running") || status.equalsIgnoreCase("waiting")){
-			out.println("<button type='button' id='BtnR"+fileName[i]+"' class='btn btn-success btn-xs' onclick=refreshRow('"+fileName[i]+"')>Refresh</button>");
+			out.println("<button type='button' id='BtnR"+fileName[i]+"' class='btn btn-success btn-xs' onclick=refreshRow('"+fileName[i]+"')>&nbsp;&nbsp;Refresh&nbsp;&nbsp;</button>");
 			//out.println("<a href='result/"+fileName[i]+"/"+fileName[i]+".zip'><button type='button' id='BtnG"+fileName[i]+"' class='btn btn-primary btn-xs' style='display:none' onclick=downloadRow('"+fileName[i]+"')>Download</button></a>");
 			out.println("<button type='button' id='BtnG"+fileName[i]+"' class='btn btn-primary btn-xs' style='display:none' onclick=downloadRow('"+fileName[i]+"')>Download</button>");
 			if(status.equalsIgnoreCase("waiting")){
 			    out.println("<button type='button' id='BtnD"+fileName[i]+"' class='btn btn-warning btn-xs' onclick=toDeleteResult('"+fileName[i]+"',this)>Delete</button>");
 			}
 			else{
-				out.println("<button type='button' id='BtnD"+fileName[i]+"' class='btn btn-warning btn-xs' onclick=toDeleteResult('"+fileName[i]+"',this)>Stop</button>");
+				out.println("<button type='button' id='BtnD"+fileName[i]+"' class='btn btn-warning btn-xs' onclick=toDeleteResult('"+fileName[i]+"',this)>&nbsp;&nbsp;Stop&nbsp;&nbsp;</button>");
 			}
 		}
 		else{
-			out.println("<button type='button' id='BtnR"+fileName[i]+"' class='btn btn-success btn-xs' style='display:none' onclick=refreshRow('"+fileName[i]+"')>Refresh</button>");
+			out.println("<button type='button' id='BtnR"+fileName[i]+"' class='btn btn-success btn-xs' style='display:none' onclick=refreshRow('"+fileName[i]+"')>&nbsp;&nbsp;Refresh&nbsp;&nbsp;</button>");
 			//out.println("<a href='result/"+fileName[i]+"/"+fileName[i]+".zip'><button type='button' id='BtnG"+fileName[i]+"' class='btn btn-primary btn-xs' onclick=downloadRow('"+fileName[i]+"')>Download</button></a>");
-			out.println("<button type='button' id='BtnG"+fileName[i]+"' class='btn btn-primary btn-xs' onclick=downloadRow('"+fileName[i]+"')>Download</button>");
-			out.println("<button type='button' id='BtnD"+fileName[i]+"' class='btn btn-warning btn-xs' onclick=toDeleteResult('"+fileName[i]+"',this)>Delete</button>");
+			out.println("<button type='button' id='BtnG"+fileName[i]+"' class='btn btn-primary btn-xs'  onclick=downloadRow('"+fileName[i]+"')>Download</button>");
+			out.println("<button type='button' id='BtnD"+fileName[i]+"' class='btn btn-warning btn-xs'  onclick=toDeleteResult('"+fileName[i]+"',this)>Delete</button>");
 		}
 		out.println("</td></tr>");
 	}
