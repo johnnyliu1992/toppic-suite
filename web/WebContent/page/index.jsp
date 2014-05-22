@@ -6,12 +6,13 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 <html>
   <head>
     <title>TopID</title>
-    <link rel="stylesheet" href="http://cdn.bootcss.com/twitter-bootstrap/3.0.3/css/bootstrap.min.css">
+<!--     <link rel="stylesheet" href="http://cdn.bootcss.com/twitter-bootstrap/3.0.3/css/bootstrap.min.css"> -->
+    <link rel="stylesheet" href="<%=basePath %>page/css/bootstrap.min.css">
     
   </head>
   <body>
-    <script src="http://cdn.bootcss.com/jquery/1.10.2/jquery.min.js"></script>
-    <script src="http://cdn.bootcss.com/twitter-bootstrap/3.0.3/js/bootstrap.min.js"></script>
+    <script src="<%=basePath %>page/js/jquery.min.js"></script>
+    <script src="<%=basePath %>page/js/bootstrap.min.js"></script>
 
 	<script type="text/javascript">
 	var msalign_check_id;
@@ -103,6 +104,12 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 			d.value="0.01";
 			d.focus();
 		}
+		if(Number(t)<0){
+			alert("must be positive!");
+			d.value="0.01";
+			d.focus();
+		}
+		
 		
 	}
 	
@@ -116,12 +123,37 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 	
 
 	</script>
+	<style type="text/css">
+        .container {width: 890px;} 
+        
+		.modal-dialog {
+		  position: relative;
+		  width: auto;
+		  margin: 0px;
+		}   
+        #downloadModal {
+        top:100px;
+		width: 599px;
+		height: 370px;
+        overflow: hidden;
+		margin: 0 auto;
+		}  
+		
+		#myModal {
+		top:100px;
+		width: 599px;
+		height: 370px;
+        overflow: hidden;
+		margin: 0 auto;
+		}    
+		
+    </style>
 
 	<!-- header -->
 	<div class="container" id="content">
 		<div class="header">
 			<ul class="nav nav-pills pull-right">
-	          <li class="active"><a href="<%=basePath %>page/helpFile.pdf">Help</a></li>
+	          <li><a href="<%=basePath %>page/helpFile.pdf" target="_blank">Help</a></li>
 	        </ul>
 			<h1 style="color:#0099DD;">TopID</h1>
 		</div>
@@ -261,9 +293,10 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 				    </div>
 				</div>
 			</div>-->
-			<div class="tab-pane" id="result" style="width:900px">
+			<div class="tab-pane" id="result" style="width:890px">
+			<br/>
 				<div class="panel panel-default" style='padding: 20px 20px 20px 20px;width:860px'>
-				<iframe id="resultFrame" name="file" src="./taskList.do" width="820px" height="897px"></iframe>
+				<iframe id="resultFrame" name="file" src="./taskList.do" width="820px" height="877px"></iframe>
 			    </div>
 			</div>
 		</div>
@@ -291,9 +324,9 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 	
-<div class="modal fade" id="downloadModal">
+<div class="modal fade" id="downloadModal" >
   <div class="modal-dialog">
-    <div class="modal-content">
+    <div class="modal-content" >
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
         <h4 class="modal-title">Processing</h4>

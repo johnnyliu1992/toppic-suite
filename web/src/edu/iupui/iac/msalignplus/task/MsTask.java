@@ -40,27 +40,12 @@ public class MsTask extends TimerTask {
 					RunningInfo.taskName = "TASK"+a[0];
 					try {
 					    String[] argArray = FileUtils.getInputFile(a[1]+"arguments.xml");
-					    System.out.println(argArray[0]+":"+argArray[1]);
+					    System.out.println("cmd /c "+context.getRealPath("/")+"tool/topid.exe -f "+ a[1]+"arguments.xml "+a[1]+argArray[0]+" "+a[1]+argArray[1]+" >"+ a[1]+"log.txt");
 						Commands.RunCommand("cmd /c "+context.getRealPath("/")+"tool/topid.exe -f "+ a[1]+"arguments.xml "+a[1]+argArray[0]+" "+a[1]+argArray[1]+" >"+ a[1]+"log.txt");
 						
 						Argument arg = Argument.getArgument(a[1], "arguments.xml");
 						arg.setEnd(System.currentTimeMillis());
 						Argument.saveArgument(a[1], arg);
-						
-						
-//						String rootPath = this.context.getRealPath("/")
-//								+ "result/" + RunningInfo.taskName + "/";
-
-//						File file = new File(rootPath + RunningInfo.taskName
-//								+ ".zip");
-//						if (!file.exists()) {
-//							FileUtils.zip(this.context.getRealPath("/")
-//									+ "temp/" + RunningInfo.taskName + ".zip",
-//									rootPath);
-//							Commands.RunCommand("cmd /c move "
-//									+ this.context.getRealPath("/") + "temp\\"
-//									+ RunningInfo.taskName + ".zip " + rootPath);
-//						}
 						
 					} catch (Exception e) {
 						e.printStackTrace();

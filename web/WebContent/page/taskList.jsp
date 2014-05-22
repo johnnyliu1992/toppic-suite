@@ -4,13 +4,17 @@
     import="edu.iupui.iac.msalignplus.dao.*"
     pageEncoding="ISO-8859-1"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<%
+String servpath = request.getContextPath();
+String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+servpath+"/";
+%>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <title>Insert title here</title>
-<link rel="stylesheet" href="http://cdn.bootcss.com/twitter-bootstrap/3.0.3/css/bootstrap.min.css">
-<script src="http://cdn.bootcss.com/jquery/1.10.2/jquery.min.js"></script>
-<script src="http://cdn.bootcss.com/twitter-bootstrap/3.0.3/js/bootstrap.min.js"></script>
+<link rel="stylesheet" href="<%=basePath %>page/css/bootstrap.min.css">
+<script src="<%=basePath %>page/js/jquery.min.js"></script>
+<script src="<%=basePath %>page/js/bootstrap.min.js"></script>
 <script type="text/javascript">
 function toDeleteResult(name,obj){
 	if(obj.innerHTML=="&nbsp;&nbsp;Stop&nbsp;&nbsp;"){
@@ -159,7 +163,7 @@ if(fileName != null){
 				if(per==100){
 					status="finished";
 				}
-				else if(RunningInfo.taskName.contains(fileName[i])){
+				else if(RunningInfo.taskName.contains(fileName[i]) && status.equalsIgnoreCase("waiting")){
 					status="running";
 				}
 				else {
