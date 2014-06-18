@@ -27,6 +27,7 @@
 		<echo message="create target directory"/>
 		<mkdir dir="${build.dir}" />
 		<mkdir dir="${build.classes}" />
+		<mkdir dir="${webRoot}/result" />
 	</target>
 	
 	
