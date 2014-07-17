@@ -8,6 +8,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -26,6 +28,17 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 public class FileUtils {
+	
+	public static void saveTimeFlag(String filePath){
+		File file = new File(filePath+"time.flag");
+		if(!file.exists()){
+			try {
+				file.createNewFile();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 	
 	public static void appendFile(String filename,String content){
 		File file = new File(filename);
@@ -250,4 +263,7 @@ public class FileUtils {
 		}
 		in.close();
 	}
+	
+	
+		
 }

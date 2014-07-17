@@ -5,18 +5,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 public class Commands {
-	
-	public static void main(String[] args){
-		try {
-			RunCommand("cmd /c ");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
 
-	public static void RunCommand(String commandLine,boolean getresult) throws IOException {
+	public static void RunCommand(String commandLine, boolean getresult)
+			throws IOException {
 		Process pro = null;
-		BufferedReader br =null;
+		BufferedReader br = null;
 		try {
 			pro = Runtime.getRuntime().exec(commandLine);
 			if (getresult) {
@@ -29,22 +22,21 @@ public class Commands {
 			}
 		} catch (IOException e) {
 			throw e;
-		}
-		finally{
-			if(br != null){
+		} finally {
+			if (br != null) {
 				try {
 					br.close();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
-			if(pro!=null){
+			if (pro != null) {
 				pro.destroy();
 			}
 		}
 	}
-	
+
 	public static void RunCommand(String commandLine) throws IOException {
-		RunCommand(commandLine,true);
+		RunCommand(commandLine, true);
 	}
 }
