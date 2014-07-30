@@ -2,6 +2,7 @@ package edu.iupui.iac.msalignplus.controller;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -12,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
+
+import edu.iupui.iac.msalignplus.action.CompratorByLastModified;
 
 @Controller
 public class FileUploadController {
@@ -168,7 +171,13 @@ public class FileUploadController {
 		System.out.println(filePath);
 		ModelAndView mav = new ModelAndView("taskList");
 		File uploadDest = new File(filePath);
-		String[] fileNames = uploadDest.list();
+		File[] files = uploadDest.listFiles();
+		Arrays.sort(files, new CompratorByLastModified());  
+		String[] fileNames = new String[files.length];
+		for(int i=0;i< fileNames.length;i++){
+			fileNames[i]=files[i].getName();
+		}
+//		String[] fileNames = uploadDest.list();
 		request.setAttribute("files", fileNames);
 		return mav;
 	}
